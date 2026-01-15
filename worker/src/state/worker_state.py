@@ -12,7 +12,11 @@ async def get_state(key: str) -> Optional[dict]:
         "SELECT value FROM worker_state WHERE key = $1",
         key,
     )
-    return row["value"] if row else None
+    if row and row["value"]:
+        # Parse JSON string back to dict
+        value_str = row["value"]
+        return json.loads(value_str) if isinstance(value_str, str) else value_str
+    return None
 
 
 async def set_state(key: str, value: dict) -> None:
