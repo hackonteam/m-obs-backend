@@ -7,9 +7,12 @@ class APIConfig(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    # Supabase
-    supabase_url: str
-    supabase_service_key: str
+    # Database
+    database_url: str
+
+    # Supabase (optional - for SDK features)
+    supabase_url: str = ""
+    supabase_service_key: str = ""
 
     # API Server
     api_port: int = 8000

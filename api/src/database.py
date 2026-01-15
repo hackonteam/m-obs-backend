@@ -1,5 +1,6 @@
 """Database connection and query helpers."""
 import asyncpg
+import ssl
 from typing import Any, Optional
 
 from .config import config
@@ -13,20 +14,18 @@ class Database:
 
     async def connect(self) -> None:
         """Establish database connection pool."""
-        # Extract database URL from Supabase URL
-        db_url = config.supabase_url.replace("https://", "").replace("http://", "")
-        project_ref = db_url.split(".")[0]
-        
-        connection_string = (
-            f"postgresql://postgres:{config.supabase_service_key}"
-            f"@db.{project_ref}.supabase.co:5432/postgres"
-        )
+        # Use DATABASE_URL directly with SSL configuration
+        # Supabase requires SSL connections
+        ssl_context = ssl.create_default_context()
+        ssl_context.check_hostname = False
+        ssl_context.verify_mode = ssl.CERT_NONE
         
         self.pool = await asyncpg.create_pool(
-            connection_string,
+            config.database_url,
             min_size=2,
             max_size=20,
             command_timeout=30,
+            ssl=ssl_context,
         )
 
     async def disconnect(self) -> None:
