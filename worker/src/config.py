@@ -1,4 +1,5 @@
 """Worker configuration management."""
+from typing import Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -11,8 +12,8 @@ class WorkerConfig(BaseSettings):
     database_url: str
 
     # Supabase (optional - for SDK features)
-    supabase_url: str = ""
-    supabase_service_key: str = ""
+    supabase_url: Optional[str] = None
+    supabase_service_key: Optional[str] = None
 
     # Worker Identity
     worker_id: str = "worker-1"
