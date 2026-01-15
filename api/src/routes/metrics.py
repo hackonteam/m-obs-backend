@@ -11,7 +11,7 @@ router = APIRouter(prefix="/metrics", tags=["metrics"])
 async def get_metrics_overview(
     start_ts: int = Query(None),
     end_ts: int = Query(None),
-    resolution: str = Query("minute", regex="^(minute|hour|day)$"),
+    resolution: str = Query("minute", pattern="^(minute|hour|day)$"),
 ) -> dict:
     """
     Get dashboard summary metrics for specified time range.

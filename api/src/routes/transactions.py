@@ -10,7 +10,7 @@ router = APIRouter(prefix="/txs", tags=["transactions"])
 
 @router.get("")
 async def get_transactions(
-    status: str = Query("all", regex="^(all|success|failed)$"),
+    status: str = Query("all", pattern="^(all|success|failed)$"),
     contract_id: Optional[int] = Query(None),
     address: Optional[str] = Query(None, min_length=42, max_length=42),
     start_ts: Optional[int] = Query(None),
@@ -18,7 +18,7 @@ async def get_transactions(
     error_signature: Optional[str] = Query(None, min_length=10, max_length=10),
     limit: int = Query(50, ge=1, le=100),
     cursor: Optional[str] = Query(None),
-    sort: str = Query("time_desc", regex="^(time_desc|time_asc|gas_desc)$"),
+    sort: str = Query("time_desc", pattern="^(time_desc|time_asc|gas_desc)$"),
 ) -> dict:
     """Get paginated transaction list with filtering."""
     # Build query

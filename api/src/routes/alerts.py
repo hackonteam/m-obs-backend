@@ -13,12 +13,12 @@ class CreateAlertRequest(BaseModel):
     """Request to create an alert."""
     name: str = Field(..., min_length=1, max_length=128)
     description: Optional[str] = None
-    alert_type: str = Field(..., regex="^(failure_rate|gas_spike|provider_down|custom)$")
+    alert_type: str = Field(..., pattern="^(failure_rate|gas_spike|provider_down|custom)$")
     conditions: dict = Field(default_factory=dict)
     threshold: float
     window_minutes: int = Field(5, ge=1, le=1440)
     cooldown_minutes: int = Field(15, ge=1, le=1440)
-    severity: str = Field("warning", regex="^(info|warning|critical)$")
+    severity: str = Field("warning", pattern="^(info|warning|critical)$")
     contract_ids: list[int] = Field(default_factory=list)
 
 
@@ -29,7 +29,7 @@ class UpdateAlertRequest(BaseModel):
     threshold: Optional[float] = None
     window_minutes: Optional[int] = Field(None, ge=1, le=1440)
     cooldown_minutes: Optional[int] = Field(None, ge=1, le=1440)
-    severity: Optional[str] = Field(None, regex="^(info|warning|critical)$")
+    severity: Optional[str] = Field(None, pattern="^(info|warning|critical)$")
     is_enabled: Optional[bool] = None
     contract_ids: Optional[list[int]] = None
 
