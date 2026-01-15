@@ -151,29 +151,24 @@ pytest
    - **Name:** `m-obs-api`
    - **Region:** Choose closest to your users
    - **Branch:** `main`
-   - **Root Directory:** Leave empty (or set to `m-obs-backend` if deploying from monorepo)
+   - **Root Directory:** `api`
    - **Runtime:** `Python 3`
-   - **Build Command:** `cd api && pip install -e .`
-   - **Start Command:** `cd api && uvicorn src.main:app --host 0.0.0.0 --port $PORT`
+   - **Build Command:** `pip install -e .`
+   - **Start Command:** `uvicorn src.main:app --host 0.0.0.0 --port $PORT`
    - **Instance Type:** Start with `Starter` ($7/month)
 
 5. **Add Environment Variables:**
    ```
-   DATABASE_URL=postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres
+   DATABASE_URL=postgresql://user:password@host:port/database
    MANTLE_RPC_ENDPOINTS=https://rpc.mantle.xyz,https://mantle.publicnode.com
    API_HOST=0.0.0.0
    CORS_ORIGINS=https://your-frontend-domain.vercel.app
-   LOG_LEVEL=INFO
    SENTRY_DSN=your-sentry-dsn (optional)
    ```
-
-   **⚠️ IMPORTANT:** For `DATABASE_URL`, use the **Connection Pooler** URL from Supabase (port 6543), NOT the direct connection (port 5432). Find it in: Supabase Dashboard → Project Settings → Database → Connection Pooler → Connection String (URI)
 
 6. Click **"Create Web Service"**
 7. Wait for deployment (2-3 minutes)
 8. **Note the API URL:** `https://m-obs-api.onrender.com`
-
-**📖 For detailed deployment instructions and troubleshooting, see [api/DEPLOY.md](api/DEPLOY.md)**
 
 ### Step 2: Create Worker Service
 
@@ -276,27 +271,10 @@ Render offers free tier with limitations:
 
 ### Troubleshooting
 
-#### API not starting - "Network is unreachable" error
-This is the most common deployment error. It means the app cannot connect to the database:
-
-1. **DATABASE_URL not set** - Check environment variables in Render dashboard
-2. **Wrong connection string** - Use Connection Pooler URL (port 6543), not direct connection (port 5432)
-3. **Supabase project paused** - Check your Supabase project status
-4. **Missing password** - Ensure you replaced `[YOUR-PASSWORD]` with actual password
-
-**How to get correct DATABASE_URL:**
-- Go to Supabase Dashboard → Project Settings → Database
-- Scroll to "Connection Pooler" section
-- Copy "Connection String" in URI format
-- Should look like: `postgresql://postgres.xxxxx:[password]@aws-0-us-east-1.pooler.supabase.com:6543/postgres`
-
-See [api/DEPLOY.md](api/DEPLOY.md) for detailed troubleshooting guide.
-
-#### API not starting - Other issues
+#### API not starting
 - Check build logs for dependency errors
 - Verify `DATABASE_URL` is correct
 - Ensure port binding uses `$PORT` environment variable
-- Check that build/start commands include `cd api`
 
 #### Worker not processing
 - Check worker logs for connection errors
