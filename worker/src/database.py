@@ -18,6 +18,7 @@ class Database:
         """Establish database connection pool."""
         try:
             # Use DATABASE_URL directly with SSL for Supabase
+            # statement_cache_size=0 is required for pgbouncer (Supabase Connection Pooler)
             self.pool = await asyncpg.create_pool(
                 config.database_url,
                 min_size=2,
@@ -25,6 +26,7 @@ class Database:
                 command_timeout=60,
                 timeout=30,
                 ssl='require',  # Require SSL for Supabase
+                statement_cache_size=0,  # Disable prepared statements for pgbouncer
             )
             logger.info("Database connection pool created successfully")
         except Exception as e:

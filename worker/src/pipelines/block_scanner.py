@@ -78,26 +78,34 @@ class BlockScanner:
             # Fetch block with transactions
             block = await provider.eth_get_block_by_number(block_num, full_txs=True)
             
-            if not block:
-                logger.warning(f"Block {block_num} not found")
+            # Validate block response
+            if not block or not isinstance(block, dict):
+                logger.warning(f"Block {block_num} returned invalid response: {type(block)}")
                 return
             
             # Verify parent hash for reorg detection
-            if self.last_block_hash and block.get("parentHash") != self.last_block_hash:
+            parent_hash = block.get("parentHash")
+            if self.last_block_hash and parent_hash and parent_hash != self.last_block_hash:
                 logger.warning(f"Reorg detected at block {block_num}!")
                 await self.handle_reorg(block_num)
                 return
             
             # Process transactions
             transactions = block.get("transactions", [])
+            if not isinstance(transactions, list):
+                logger.warning(f"Block {block_num} has invalid transactions field: {type(transactions)}")
+                return
+                
             block_timestamp = int(block.get("timestamp", "0x0"), 16)
             
             if transactions:
                 await self.process_transactions(transactions, block_num, block_timestamp)
             
             # Update state
-            self.last_block_hash = block.get("hash")
-            await set_last_scanned_block(block_num, self.last_block_hash)
+            block_hash = block.get("hash")
+            if block_hash:
+                self.last_block_hash = block_hash
+            await set_last_scanned_block(block_num, self.last_block_hash or "0x0")
             
             logger.info(f"Scanned block {block_num} with {len(transactions)} transactions")
         
