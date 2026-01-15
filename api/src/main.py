@@ -22,14 +22,26 @@ async def lifespan(app: FastAPI):
     """Application lifespan manager."""
     # Startup
     logger.info("Starting M-OBS API")
-    await db.connect()
-    logger.info("Database connected")
+    logger.info(f"Attempting to connect to database...")
+    
+    try:
+        await db.connect()
+        logger.info("Database connected successfully")
+    except Exception as e:
+        logger.error(f"Failed to connect to database: {e}")
+        logger.error("Application will continue but database operations will fail")
+        # Don't raise - allow app to start even if DB connection fails
+        # This helps with debugging on Render
     
     yield
     
     # Shutdown
     logger.info("Shutting down M-OBS API")
-    await db.disconnect()
+    try:
+        await db.disconnect()
+        logger.info("Database disconnected")
+    except Exception as e:
+        logger.error(f"Error disconnecting database: {e}")
 
 
 # Create FastAPI app

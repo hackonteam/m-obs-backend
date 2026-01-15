@@ -32,8 +32,13 @@ class Worker:
         logger.info(f"Starting M-OBS Worker {config.worker_id}")
         
         # Connect to database
-        await db.connect()
-        logger.info("Database connected")
+        try:
+            await db.connect()
+            logger.info("Database connected successfully")
+        except Exception as e:
+            logger.error(f"Failed to connect to database: {e}")
+            logger.error("Worker cannot start without database connection")
+            raise
         
         # Start pipelines
         self.tasks = [
